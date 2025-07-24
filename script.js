@@ -20,7 +20,14 @@ function sendDailyReport() {
             return;
         }
 
-        const reportHtml = generateReportHtml(timeEntries, today);
+        const signature = getGmailSignature();
+        if (!signature) {
+            console.log('Gmail signature not found. Report will not be sent.');
+            sendErrorNotification(new Error('Gmail signature not found. Please check your Gmail signature settings.'));
+            return;
+        }
+
+        const reportHtml = generateReportHtml(timeEntries, today, signature);
         sendEmailReport(reportHtml, today);
 
         console.log('Report successfully sent');
@@ -28,6 +35,42 @@ function sendDailyReport() {
         console.error('Error sending report:', error);
         // Optional: send error notification to yourself
         sendErrorNotification(error);
+    }
+}
+
+/**
+ * Get Gmail signature from settings
+ */
+function getGmailSignature() {
+    try {
+        // Get Gmail settings
+        const settings = Gmail.Users.Settings.SendAs.list('me');
+        
+        // Find the primary email address (usually the first one or marked as primary)
+        let primarySendAs = null;
+        for (const sendAs of settings.sendAs) {
+            if (sendAs.isPrimary || sendAs.isDefault) {
+                primarySendAs = sendAs;
+                break;
+            }
+        }
+        
+        // If no primary found, use the first one
+        if (!primarySendAs && settings.sendAs.length > 0) {
+            primarySendAs = settings.sendAs[0];
+        }
+        
+        // Return signature if exists
+        if (primarySendAs && primarySendAs.signature) {
+            return primarySendAs.signature;
+        }
+        
+        console.log('No signature found, using default');
+        return null;
+        
+    } catch (error) {
+        console.error('Error getting Gmail signature:', error);
+        return null;
     }
 }
 
@@ -60,7 +103,7 @@ function getTimeEntriesForDate(date) {
 /**
  * Generate HTML report
  */
-function generateReportHtml(timeEntries, date) {
+function generateReportHtml(timeEntries, date, signature) {
     const dateStr = Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd.MM.yyyy');
     let totalHours = 0;
 
@@ -104,10 +147,9 @@ function generateReportHtml(timeEntries, date) {
             </tfoot>
           </table>
           
-          <p style="margin-top: 30px; color: #666;">
-            Regards,<br>
-            Automated Redmine Report
-          </p>
+          <div style="margin-top: 30px;">
+            ${signature}
+          </div>
         </body>
       </html>
     `;
