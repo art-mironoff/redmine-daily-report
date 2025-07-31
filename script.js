@@ -3,9 +3,10 @@ const CONFIG = {
     apiKey: 'YOUR_API_KEY', // Your Redmine API key
     userId: 'YOUR_USER_ID', // Your Redmine user ID
     clientEmail: 'client.email@example.com', // Client email
-    subject: 'Daily Report', // Email subject
-    customerName: 'Customer', // Customer name
     ccEmails: [], // Additional recipients (optional)
+    subjectText: 'Daily Report', // Email subject
+    subjectDateFormat: 'MM_dd_yy', // Date format for email subject
+    customerName: 'Customer', // Customer name
 };
 
 /**
@@ -228,8 +229,8 @@ function generateReportHtml(timeEntries, date, signature) {
  * Send email report
  */
 function sendEmailReport(htmlContent, date) {
-    const dateStr = Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd.MM.yyyy');
-    const subject = `${CONFIG.subject} - ${dateStr}`;
+    const dateStr = Utilities.formatDate(date, Session.getScriptTimeZone(), CONFIG.subjectDateFormat);
+    const subject = `${CONFIG.subjectText} ${dateStr}`;
 
     const options = {
         htmlBody: htmlContent,
