@@ -2,7 +2,8 @@ const CONFIG = {
     redmineUrl: 'https://redmine.example.com/', // Replace with your Redmine URL
     apiKey: 'YOUR_API_KEY', // Your Redmine API key
     userId: 'YOUR_USER_ID', // Your Redmine user ID
-    clientEmail: 'client.email@example.com', // Client email
+    senderName: 'John Smith', // Your name to display in "from" field. Example: John Smith <john.smith@gmail.com>
+    toEmail: 'customer.email@example.com', // Customer email
     ccEmails: [], // Additional recipients (optional)
     subjectText: 'Daily Report', // Email subject
     subjectDateFormat: 'MM_dd_yy', // Date format for email subject
@@ -234,10 +235,11 @@ function sendEmailReport(htmlContent, date) {
 
     const options = {
         htmlBody: htmlContent,
-        cc: CONFIG.ccEmails.join(',')
+        cc: CONFIG.ccEmails.join(','),
+        name: CONFIG.senderName // This adds your name to the "from" field. Example: John Smith <john.smith@gmail.com>
     };
 
-    GmailApp.sendEmail(CONFIG.clientEmail, subject, '', options);
+    GmailApp.sendEmail(CONFIG.toEmail, subject, '', options);
 }
 
 /**
@@ -247,7 +249,11 @@ function sendErrorNotification(error) {
     const subject = 'Error in Redmine daily report';
     const body = `An error occurred while generating the daily report:\n\n${error.toString()}\n\nTime: ${new Date()}`;
 
-    GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body);
+    const options = {
+        name: CONFIG.senderName // This adds your name to the "from" field. Example: John Smith <john.smith@gmail.com>
+    };
+
+    GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body, options);
 }
 
 /**
