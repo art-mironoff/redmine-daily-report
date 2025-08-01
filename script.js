@@ -255,34 +255,3 @@ function sendErrorNotification(error) {
 
     GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body, options);
 }
-
-/**
- * Function for testing (run manually to check)
- */
-function testReport() {
-    console.log('Testing report...');
-    sendDailyReport();
-}
-
-/**
- * Function to set up a daily trigger
- * Run once to create an automatic schedule
- */
-function setupDailyTrigger() {
-    // Delete existing triggers
-    const triggers = ScriptApp.getProjectTriggers();
-    triggers.forEach(trigger => {
-        if (trigger.getHandlerFunction() === 'sendDailyReport') {
-            ScriptApp.deleteTrigger(trigger);
-        }
-    });
-
-    // Create a new trigger (every day at 6 PM)
-    ScriptApp.newTrigger('sendDailyReport')
-        .timeBased()
-        .everyDays(1)
-        .atHour(18) // Change time as needed
-        .create();
-
-    console.log('Daily trigger set for 6 PM');
-}
