@@ -3,7 +3,10 @@ const CONFIG = {
     apiKey: 'YOUR_API_KEY', // Your Redmine API key
     userId: 'YOUR_USER_ID', // Your Redmine user ID
     senderName: 'John Smith', // Your name to display in "from" field. Example: John Smith <john.smith@gmail.com>
-    toEmail: 'customer.email@example.com', // Customer email
+    toEmail: [
+        'John Smith <john.smith@example.com>',
+        'Jane Doe <jane.doe@example.com>'
+    ], // Customer emails with names in format "Name <email>"
     ccEmails: [], // Additional recipients (optional)
     subjectText: 'Daily Report', // Email subject
     subjectDateFormat: 'MM_dd_yy', // Date format for email subject
@@ -242,7 +245,7 @@ function sendEmailReport(htmlContent, date) {
         name: CONFIG.senderName // This adds your name to the "from" field. Example: John Smith <john.smith@gmail.com>
     };
 
-    GmailApp.sendEmail(CONFIG.toEmail, subject, '', options);
+    GmailApp.sendEmail(CONFIG.toEmail.join(','), subject, '', options);
 }
 
 /**
