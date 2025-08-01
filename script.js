@@ -151,8 +151,11 @@ function generateReportHtml(timeEntries, date, signature) {
     let tableRows = '';
     timeEntries.forEach((entry, index) => {
         totalHours += entry.hours;
-        const rowBgColor = index % 2 === 0 ? 'rgb(220,230,243)' : 'rgb(245,255,153)';
         const issue = entry.issueDetails;
+
+        const completedStatuses = ['Resolved', 'Closed', 'Deployed'];
+        const isCompleted = issue?.status?.name && completedStatuses.includes(issue.status.name);
+        const rowBgColor = isCompleted ? 'rgb(245,255,153)' : 'rgb(220,230,243)';
         
         // Progress bar for % Done
         const donePercent = issue?.done_ratio || 0;
