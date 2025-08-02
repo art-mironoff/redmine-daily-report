@@ -11,6 +11,7 @@ const CONFIG = {
     subjectText: 'Daily Report', // Email subject
     subjectDateFormat: 'MM_dd_yy', // Date format for email subject
     customerName: 'Customer', // Customer name
+    enableValidation: true, // Enable/disable time validation (check if total hours equals exactly 8 hours)
 };
 
 /**
@@ -24,6 +25,16 @@ function sendDailyReport() {
         if (timeEntries.length === 0) {
             console.log('No time entries for today');
             return;
+        }
+
+        // Validate time entries if enabled
+        if (CONFIG.enableValidation) {
+            const validationResult = validateTimeEntries(timeEntries);
+            if (!validationResult.isValid) {
+                console.log('Validation failed:', validationResult.error);
+                sendValidationErrorNotification(validationResult.error, validationResult.totalHours);
+                return;
+            }
         }
 
         const signature = getGmailSignature();
@@ -78,6 +89,50 @@ function getGmailSignature() {
         console.error('Error getting Gmail signature:', error);
         return null;
     }
+}
+
+/**
+ * Validate time entries (check if total hours equals exactly 8 hours)
+ */
+function validateTimeEntries(timeEntries) {
+    const totalHours = timeEntries.reduce((sum, entry) => sum + entry.hours, 0);
+    const requiredHours = 8;
+    
+    if (totalHours !== requiredHours) {
+        const errorType = totalHours < requiredHours ? 'less than' : 'more than';
+        return {
+            isValid: false,
+            error: `Total logged time (${totalHours} hours) is ${errorType} required (${requiredHours} hours)`,
+            totalHours: totalHours
+        };
+    }
+    
+    return {
+        isValid: true,
+        totalHours: totalHours
+    };
+}
+
+/**
+ * Send validation error notification
+ */
+function sendValidationErrorNotification(errorMessage, totalHours) {
+    const subject = 'Daily Report Validation Error';
+    const body = `
+Daily report was not sent due to validation error:
+
+${errorMessage}
+
+Please check your time entries and ensure they don't exceed 8 hours per day.
+
+Time: ${new Date()}
+    `.trim();
+
+    const options = {
+        name: CONFIG.senderName
+    };
+
+    GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body, options);
 }
 
 /**
