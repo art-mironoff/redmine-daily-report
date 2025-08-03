@@ -7,10 +7,10 @@ const CONFIG = {
         'John Smith <john.smith@example.com>',
         'Jane Doe <jane.doe@example.com>'
     ], // Customer emails with names in format "Name <email>"
-    ccEmails: [], // Additional recipients (optional)
+    ccEmails: [], // Additional recipients with names in format "Name <email>" (optional)
     subjectText: 'Daily Report', // Email subject
     subjectDateFormat: 'MM_dd_yy', // Date format for email subject
-    customerName: 'Customer', // Customer name
+    customerName: 'Customer', // Customer name used in email greeting.
     enableValidation: true, // Enable/disable time validation (check if total hours equals exactly 8 hours)
 };
 
