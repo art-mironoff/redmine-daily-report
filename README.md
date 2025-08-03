@@ -6,7 +6,7 @@ This Google Apps Script automates generating and sending daily reports based on 
 
 Example:
 
-![Daily Report Email Example](daily-report-example.png)
+<img src="daily-report-example.png" width="982" alt="Daily Report Email Example">
 
 ### Setup Instructions:
 
