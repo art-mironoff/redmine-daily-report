@@ -21,13 +21,14 @@ Example:
     *   `redmineUrl`: Your Redmine instance URL.
     *   `apiKey`: Your Redmine API key (find it in "My account" → "API access key").
     *   `userId`: Your Redmine user ID (found in your profile URL).
-    *   `senderName`: Your name to display in "from" field (e.g., "John Smith").
+    *   `senderName`: Your name to display in "from" field (e.g., "Arthur Mironov").
     *   `toEmail`: Array of recipient emails with names in format "Name <email>".
     *   `ccEmails`: Additional CC recipients with names in format "Name <email>" (optional).
     *   `subjectText`: Email subject text (default: "Daily Report").
     *   `subjectDateFormat`: Date format for email subject (default: "MM_dd_yy").
-    *   `customerName`: Customer name used in email greeting.
+    *   `customerName`: Customer name used in email greeting. (Hello %customerName%)
     *   `enableValidation`: Enable/disable time validation (checks if total hours equals exactly 8 hours).
+    *   `projects`: Array of project IDs or names to include in report. Empty array = all projects.
 
 3.  **Granting Permissions:**
     *   In the Google Apps Script editor, select the `sendDailyReport()` function from the dropdown menu.

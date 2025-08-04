@@ -11,6 +11,7 @@ const CONFIG = {
     subjectText: 'Daily Report', // Email subject
     subjectDateFormat: 'MM_dd_yy', // Date format for email subject
     customerName: 'Customer', // Customer name used in email greeting.
+    projects: [], // Project IDs or names to include in report. Empty array = all projects
     enableValidation: true, // Enable/disable time validation (check if total hours equals exactly 8 hours)
 };
 
@@ -158,9 +159,23 @@ function getTimeEntriesForDate(date) {
     }
 
     const data = JSON.parse(response.getContentText());
-    const timeEntries = data.time_entries || [];
+    let timeEntries = data.time_entries || [];
     
-    // Get detailed issue information for each time entry
+    // Filter by projects if specified
+    if (CONFIG.projects && CONFIG.projects.length > 0) {
+        timeEntries = timeEntries.filter(entry => {
+            if (!entry.project) {
+                return false;
+            }
+
+            return CONFIG.projects.some(projectFilter => {
+                // Support filtering by project ID or name
+                return projectFilter == entry.project.id || projectFilter === entry.project.name;
+            });
+        });
+    }
+
+    // Get detailed issue information only for filtered entries
     return timeEntries.map(entry => {
         if (entry.issue && entry.issue.id) {
             const issueDetails = getIssueDetails(entry.issue.id);
