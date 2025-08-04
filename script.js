@@ -251,7 +251,7 @@ function generateReportHtml(timeEntries, date, signature) {
               : issue?.subject
             }
           </td>
-          <td style="padding:6px;border:1px solid rgb(227,229,236);text-align:right;vertical-align:top;">${entry.hours}</td>
+          <td style="padding:6px;border:1px solid rgb(227,229,236);text-align:right;vertical-align:top;">${entry.hours}h</td>
           <td style="padding:6px;border:1px solid rgb(227,229,236);vertical-align:top;">${progressBar}</td>
         </tr>
       `;
@@ -286,7 +286,7 @@ function generateReportHtml(timeEntries, date, signature) {
             <tfoot>
               <tr style="font-weight: bold;background-color:rgb(249,249,249);">
                 <td colspan="7" style="padding:6px;border:1px solid rgb(227,229,236);text-align:right;vertical-align:top;">Total:</td>
-                <td style="padding:6px;border:1px solid rgb(227,229,236);text-align:right;vertical-align:top;">${totalHours}</td>
+                <td style="padding:6px;border:1px solid rgb(227,229,236);text-align:right;vertical-align:top;">${totalHours}h</td>
                 <td style="padding:6px;border:1px solid rgb(227,229,236);vertical-align:top;"></td>
               </tr>
             </tfoot>
