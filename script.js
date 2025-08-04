@@ -13,6 +13,7 @@ const CONFIG = {
     customerName: 'Customer', // Customer name used in email greeting.
     projects: [], // Project IDs or names to include in report. Empty array = all projects
     enableValidation: true, // Enable/disable time validation (check if total hours equals exactly 8 hours)
+    saveToDrafts: false, // Save to Drafts instead of sending immediately
 };
 
 /**
@@ -46,9 +47,9 @@ function sendDailyReport() {
         }
 
         const reportHtml = generateReportHtml(timeEntries, today, signature);
-        sendEmailReport(reportHtml, today);
 
-        console.log('Report successfully sent');
+        processEmailReport(reportHtml, today, !CONFIG.saveToDrafts);
+        console.log(CONFIG.saveToDrafts ? 'Report successfully saved to drafts' : 'Report successfully sent');
     } catch (error) {
         console.error('Error sending report:', error);
         // Optional: send error notification to yourself
@@ -303,9 +304,9 @@ function generateReportHtml(timeEntries, date, signature) {
 }
 
 /**
- * Send email report
+ * Process email report (send or save to drafts)
  */
-function sendEmailReport(htmlContent, date) {
+function processEmailReport(htmlContent, date, sendImmediately = true) {
     const dateStr = Utilities.formatDate(date, Session.getScriptTimeZone(), CONFIG.subjectDateFormat);
     const subject = `${CONFIG.subjectText} ${dateStr}`;
 
@@ -315,7 +316,11 @@ function sendEmailReport(htmlContent, date) {
         name: CONFIG.senderName // This adds your name to the "from" field. Example: John Smith <john.smith@gmail.com>
     };
 
-    GmailApp.sendEmail(CONFIG.toEmail.join(','), subject, '', options);
+    if (sendImmediately) {
+        GmailApp.sendEmail(CONFIG.toEmail.join(','), subject, '', options);
+    } else {
+        GmailApp.createDraft(CONFIG.toEmail.join(','), subject, '', options);
+    }
 }
 
 /**

@@ -1,6 +1,6 @@
 # Redmine Daily Report
 
-This Google Apps Script automates generating and sending daily reports based on Redmine time entries to a specified client email.
+This Google Apps Script automates generating and sending daily reports based on Redmine time entries to a specified client email. Reports can be sent immediately or saved to Gmail drafts for manual review before sending.
 
 **Note:** Only Gmail accounts are supported for sending emails.
 
@@ -29,6 +29,7 @@ Example:
     *   `customerName`: Customer name used in email greeting. (Hello %customerName%)
     *   `enableValidation`: Enable/disable time validation (checks if total hours equals exactly 8 hours).
     *   `projects`: Array of project IDs or names to include in report. Empty array = all projects.
+    *   `saveToDrafts`: Save report to Gmail drafts instead of sending immediately (default: false).
 
 3.  **Granting Permissions:**
     *   In the Google Apps Script editor, select the `sendDailyReport()` function from the dropdown menu.
@@ -46,6 +47,7 @@ Example:
 
 ### Features:
 
+*   **Draft Mode**: Option to save reports to Gmail drafts for manual review before sending (`saveToDrafts: true`).
 *   **Automatic Gmail Signature Integration**: The script automatically fetches and includes your Gmail signature in reports.
 *   **Time Validation**: When enabled (`enableValidation: true`), validates that total logged time equals exactly 8 hours per day.
 *   **Error Notifications**: Automatically sends error notifications to your email for validation failures or system errors.
