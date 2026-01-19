@@ -336,3 +336,45 @@ function sendErrorNotification(error) {
 
     GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body, options);
 }
+
+/**
+ * Build Gmail add-on card with a button to run sendDailyReport
+ */
+function onHomepage(e) {
+    return buildDailyReportCard();
+}
+
+/**
+ * Create a simple card with a single action button
+ */
+function buildDailyReportCard() {
+    const action = CardService.newAction().setFunctionName('handleSendDailyReport');
+    const button = CardService.newTextButton()
+        .setText('Daily Report')
+        .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
+        .setOnClickAction(action);
+
+    const section = CardService.newCardSection().addWidget(button);
+
+    return CardService.newCardBuilder()
+        .addSection(section)
+        .build();
+}
+
+/**
+ * Handle button click: run report and show a notification
+ */
+function handleSendDailyReport(e) {
+    try {
+        sendDailyReport();
+        const message = CONFIG.saveToDrafts ? 'Report saved to Drafts' : 'Report sent';
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification().setText(message))
+            .build();
+    } catch (err) {
+        const text = 'Error: ' + (err && err.message ? err.message : String(err));
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification().setText(text))
+            .build();
+    }
+}
