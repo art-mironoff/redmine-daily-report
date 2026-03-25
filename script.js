@@ -19,9 +19,9 @@ const CONFIG = {
 /**
  * Main function to send the daily report
  */
-function sendDailyReport() {
+function sendDailyReport(date) {
     try {
-        const today = new Date();
+        const today = date || new Date();
         const timeEntries = getTimeEntriesForDate(today);
 
         if (timeEntries.length === 0) {
@@ -217,6 +217,20 @@ function getIssueDetails(issueId) {
 }
 
 /**
+ * Get human-readable date label relative to today
+ */
+function getDateLabel(date) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.round((today - target) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    return 'On ' + Utilities.formatDate(date, Session.getScriptTimeZone(), 'MM/dd');
+}
+
+/**
  * Generate HTML report
  */
 function generateReportHtml(timeEntries, date, signature) {
@@ -264,7 +278,7 @@ function generateReportHtml(timeEntries, date, signature) {
           <div>
             Hello ${CONFIG.customerName},<br/>
             <br/>
-            Today I worked on:
+            ${getDateLabel(date)} I worked on:
           </div>
           
           <table style="border-spacing:0px;border-collapse:collapse;margin-bottom:0px;font-size:0.88em">
@@ -337,6 +351,7 @@ function sendErrorNotification(error) {
     GmailApp.sendEmail(Session.getActiveUser().getEmail(), subject, body, options);
 }
 
+
 /**
  * Build Gmail add-on card with a button to run sendDailyReport
  */
@@ -348,13 +363,20 @@ function onHomepage(e) {
  * Create a simple card with a single action button
  */
 function buildDailyReportCard() {
+    const datePicker = CardService.newDatePicker()
+        .setTitle('Report Date')
+        .setFieldName('report_date')
+        .setValueInMsSinceEpoch(new Date().setUTCHours(12, 0, 0, 0));
+
     const action = CardService.newAction().setFunctionName('handleSendDailyReport');
     const button = CardService.newTextButton()
-        .setText('Daily Report')
+        .setText('Create Cklig Report')
         .setTextButtonStyle(CardService.TextButtonStyle.FILLED)
         .setOnClickAction(action);
 
-    const section = CardService.newCardSection().addWidget(button);
+    const section = CardService.newCardSection()
+        .addWidget(datePicker)
+        .addWidget(button);
 
     return CardService.newCardBuilder()
         .addSection(section)
@@ -366,7 +388,9 @@ function buildDailyReportCard() {
  */
 function handleSendDailyReport(e) {
     try {
-        sendDailyReport();
+        const msSinceEpoch = e.commonEventObject.formInputs.report_date.dateInput.msSinceEpoch;
+        const selectedDate = new Date(msSinceEpoch);
+        sendDailyReport(selectedDate);
         const message = CONFIG.saveToDrafts ? 'Report saved to Drafts' : 'Report sent';
         return CardService.newActionResponseBuilder()
             .setNotification(CardService.newNotification().setText(message))
