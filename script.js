@@ -190,30 +190,25 @@ function getTimeEntriesForDate(date) {
  * Get detailed issue information from Redmine API
  */
 function getIssueDetails(issueId) {
-    const url = `${CONFIG.redmineUrl}/issues/${issueId}.json?include=attachments,relations,changesets,journals,watchers`;
+    const url = `${CONFIG.redmineUrl}/issues/${issueId}.json`;
     
     const options = {
         method: 'GET',
         headers: {
             'X-Redmine-API-Key': CONFIG.apiKey,
             'Content-Type': 'application/json'
-        }
+        },
+        muteHttpExceptions: true
     };
 
-    try {
-        const response = UrlFetchApp.fetch(url, options);
-        
-        if (response.getResponseCode() !== 200) {
-            console.error(`Error fetching issue ${issueId}: ${response.getResponseCode()}`);
-            return null;
-        }
+    const response = UrlFetchApp.fetch(url, options);
+    const code = response.getResponseCode();
 
-        const data = JSON.parse(response.getContentText());
-        return data.issue;
-    } catch (error) {
-        console.error(`Error fetching issue ${issueId}:`, error);
-        return null;
+    if (code !== 200) {
+        throw new Error(`Redmine API error fetching issue ${issueId}: HTTP ${code} — ${response.getContentText().slice(0, 500)}`);
     }
+
+    return JSON.parse(response.getContentText()).issue;
 }
 
 /**
